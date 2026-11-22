@@ -34,7 +34,6 @@ Then open http://127.0.0.1:8765
 
 CLI deploy from this Windows machine is not required. Import the GitHub repo:
 
-1. Open https://vercel.com/new and import `aayankhan0325/project-cmdanalysis`.
-2. Framework preset: Other. Output directory: `public`.
-3. Add environment variable `COINGECKO_API_KEY`.
-4. Deploy. Routes in `api/` become serverless functions (`/api/market`, `/api/csv`, `/api/health`).
+Live site: https://project-cmdanalysis.vercel.app
+
+That URL, `/public/index.html`, and `/api/market` all serve the dashboard and CoinGecko API. In the Vercel project, set `COINGECKO_API_KEY` if live prices should use the demo key.
