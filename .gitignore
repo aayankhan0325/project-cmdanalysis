@@ -5,3 +5,5 @@ __pycache__/
 .DS_Store
 outputs/*.db
 outputs/*.sqlite
+.vercel
+node_modules/
