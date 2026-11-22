@@ -23,8 +23,18 @@ Set `COINGECKO_API_KEY` in `.env`. Outputs land in `outputs/crypto_market_data.c
 
 The dashboard reads `/api/market` and refreshes every 60 seconds. CSV download uses quoted columns, ISO dates, and a UTF-8 BOM.
 
+```bash
+python main.py
+python serve.py
+```
+
+Then open http://127.0.0.1:8765
+
 ## Vercel
 
-1. Import this GitHub repository in Vercel.
-2. Add environment variable `COINGECKO_API_KEY`.
-3. Deploy. The site is static files in `public/` plus serverless routes in `api/`.
+CLI deploy from this Windows machine is not required. Import the GitHub repo:
+
+1. Open https://vercel.com/new and import `aayankhan0325/project-cmdanalysis`.
+2. Framework preset: Other. Output directory: `public`.
+3. Add environment variable `COINGECKO_API_KEY`.
+4. Deploy. Routes in `api/` become serverless functions (`/api/market`, `/api/csv`, `/api/health`).
