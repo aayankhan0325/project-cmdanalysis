@@ -38,12 +38,14 @@ function rowsFor(coin) {
 function showCards() {
   const cards = document.getElementById("cards");
   cards.innerHTML = Object.values(dataset).map((coin) => {
-    const up = coin.change_24h_pct >= 0;
+    const change = Number(coin.change_24h_pct ?? coin.latest_daily_change_pct ?? 0);
+    const up = change >= 0;
+    const code = coin.symbol || String(coin.id || coin.name || "").toUpperCase();
     return `
       <article class="card">
         <header>
-          <p>${coin.name} · ${coin.symbol || coin.id.toUpperCase()}</p>
-          <span class="${up ? "up" : "down"}">${up ? "+" : ""}${coin.change_24h_pct}%</span>
+          <p>${coin.name} · ${code}</p>
+          <span class="${up ? "up" : "down"}">${up ? "+" : ""}${change}%</span>
         </header>
         <strong>${money(coin.latest_price)}</strong>
         <div class="metrics">
@@ -202,7 +204,15 @@ function downloadCsv() {
 }
 
 function normalizePayload(payload) {
-  return payload.coins || payload;
+  const coins = payload.coins || payload;
+  Object.entries(coins).forEach(([id, coin]) => {
+    coin.id = coin.id || id;
+    coin.symbol = coin.symbol || ({ bitcoin: "BTC", ethereum: "ETH" }[id]) || id.slice(0, 3).toUpperCase();
+    coin.change_24h_pct = Number(coin.change_24h_pct ?? coin.latest_daily_change_pct ?? 0);
+    coin.market_caps = coin.market_caps || [];
+    coin.changes = coin.changes || [];
+  });
+  return coins;
 }
 
 function setDateBounds(coins) {

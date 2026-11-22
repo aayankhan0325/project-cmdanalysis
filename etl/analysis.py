@@ -6,12 +6,17 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def _summarize_coin(group: pd.DataFrame) -> dict:
+def _summarize_coin(coin_id: str, group: pd.DataFrame) -> dict:
     latest_row = group.sort_values("date").iloc[-1]
     previous = group.sort_values("date").iloc[-2] if len(group) > 1 else latest_row
     corr = group["market_cap_usd"].corr(group["volume_usd"])
+    symbols = {"bitcoin": "BTC", "ethereum": "ETH"}
+    change = round(float(latest_row["daily_change_pct"]), 4)
     return {
+        "id": coin_id,
         "name": str(latest_row["coin_name"]),
+        "symbol": symbols.get(coin_id, coin_id[:3].upper()),
+        "change_24h_pct": change,
         "latest_price": round(float(latest_row["price_usd"]), 2),
         "latest_market_cap": round(float(latest_row["market_cap_usd"]), 2),
         "latest_volume": round(float(latest_row["volume_usd"]), 2),
@@ -19,7 +24,7 @@ def _summarize_coin(group: pd.DataFrame) -> dict:
         "highest_price": round(float(group["price_usd"].max()), 2),
         "lowest_price": round(float(group["price_usd"].min()), 2),
         "average_daily_change_pct": round(float(group["daily_change_pct"].mean()), 4),
-        "latest_daily_change_pct": round(float(latest_row["daily_change_pct"]), 4),
+        "latest_daily_change_pct": change,
         "previous_price": round(float(previous["price_usd"]), 2),
         "mcap_volume_correlation": round(float(corr) if pd.notna(corr) else 0.0, 4),
         "dates": group["date"].dt.strftime("%Y-%m-%d").tolist(),
@@ -54,7 +59,7 @@ def run_eda(df: pd.DataFrame, output_dir: Path, frontend_dir: Path) -> None:
     plt.savefig(output_dir / "volume_comparison.png")
     plt.close()
 
-    summary = {coin_id: _summarize_coin(group) for coin_id, group in df.groupby("coin_id")}
+    summary = {coin_id: _summarize_coin(coin_id, group) for coin_id, group in df.groupby("coin_id")}
     payload = {
         "generated_at": pd.Timestamp.now(tz="UTC").isoformat(),
         "source": "CoinGecko API",
