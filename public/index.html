@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Market Intelligence</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="glow glow-one"></div>
+  <div class="glow glow-two"></div>
+
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Live ETL Pipeline · CoinGecko</p>
+      <h1>Crypto Market <span>Intelligence</span></h1>
+      <p class="sub">Bitcoin and Ethereum prices, volume, and market cap — refreshed every minute</p>
+    </div>
+    <div class="live-box">
+      <div class="pulse"></div>
+      <div>
+        <strong id="liveLabel">Connecting</strong>
+        <p id="countdown">Next refresh in 60s</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="status" class="status">Loading live market dataset...</div>
+    <section id="cards" class="cards"></section>
+
+    <section class="toolbar panel">
+      <div>
+        <label for="startDate">From</label>
+        <input type="date" id="startDate">
+      </div>
+      <div>
+        <label for="endDate">To</label>
+        <input type="date" id="endDate">
+      </div>
+      <div>
+        <label for="coinSelect">Asset</label>
+        <select id="coinSelect">
+          <option value="bitcoin">Bitcoin</option>
+          <option value="ethereum">Ethereum</option>
+        </select>
+      </div>
+      <button id="resetDates" type="button">Reset range</button>
+      <button id="downloadCsv" type="button">Download CSV</button>
+      <button id="refreshNow" class="ghost" type="button">Refresh now</button>
+    </section>
+
+    <section class="panel price-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Price history</p>
+          <h2>Daily close trend</h2>
+        </div>
+        <p class="hint" id="rangeHint">Full year view</p>
+      </div>
+      <canvas id="priceChart"></canvas>
+    </section>
+
+    <div class="chart-grid">
+      <section class="panel">
+        <p class="eyebrow">Relative performance</p>
+        <h2>Bitcoin vs Ethereum</h2>
+        <p class="hint">Indexed to the first visible day.</p>
+        <canvas id="comparisonChart"></canvas>
+      </section>
+      <section class="panel">
+        <p class="eyebrow">Market activity</p>
+        <h2>Daily trading volume</h2>
+        <canvas id="volumeChart"></canvas>
+      </section>
+      <section class="panel">
+        <p class="eyebrow">Relationship</p>
+        <h2>Market cap vs volume</h2>
+        <canvas id="scatterChart"></canvas>
+      </section>
+      <section class="panel">
+        <p class="eyebrow">Volatility</p>
+        <h2>Daily percentage change</h2>
+        <canvas id="changeChart"></canvas>
+      </section>
+    </div>
+
+    <section class="panel table-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Clean dataset</p>
+          <h2>Latest transformed rows</h2>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Coin</th>
+              <th>Price (USD)</th>
+              <th>Market cap</th>
+              <th>Volume</th>
+              <th>Daily change</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      Source: CoinGecko API · Validated with Pydantic · Loaded to CSV and SQLite · Auto-refresh 60s
+    </footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
