@@ -1,0 +1,9 @@
+{
+  "name": "crypto-market-etl-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cryptocurrency ETL dashboard with CoinGecko API",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}
