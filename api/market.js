@@ -1,4 +1,4 @@
-const { COINS, geckoFetch } = require("./_lib/coingecko");
+const { COINS, geckoFetch } = require("../lib/coingecko");
 
 let cache = { expiresAt: 0, payload: null };
 const CACHE_MS = 45_000;

@@ -56,7 +56,7 @@ def run_eda(df: pd.DataFrame, output_dir: Path, frontend_dir: Path) -> None:
 
     summary = {coin_id: _summarize_coin(group) for coin_id, group in df.groupby("coin_id")}
     payload = {
-        "generated_at": pd.Timestamp.utcnow().isoformat(),
+        "generated_at": pd.Timestamp.now(tz="UTC").isoformat(),
         "source": "CoinGecko API",
         "coins": summary,
     }
