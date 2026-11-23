@@ -14,6 +14,7 @@ let dataset = {};
 let charts = {};
 let secondsLeft = 60;
 let timerId = null;
+let dateBounds = null;
 
 function csvEscape(value) {
   return `"${String(value ?? "").replaceAll('"', '""')}"`;
@@ -217,24 +218,38 @@ function normalizePayload(payload) {
 
 function setDateBounds(coins) {
   const allDates = Object.values(coins).flatMap((coin) => coin.dates).sort();
-  if (!allDates.length) return;
+  dateBounds = allDates.length
+    ? { start: allDates[0], end: allDates.at(-1) }
+    : null;
+  if (!dateBounds) return;
   const start = document.getElementById("startDate");
   const end = document.getElementById("endDate");
   if (!start.dataset.ready) {
-    start.value = allDates[0];
-    end.value = allDates.at(-1);
+    start.value = dateBounds.start;
+    end.value = dateBounds.end;
     start.dataset.ready = "true";
   }
+}
+
+function resetDateRange() {
+  if (!dateBounds) return;
+  document.getElementById("startDate").value = dateBounds.start;
+  document.getElementById("endDate").value = dateBounds.end;
+  drawCharts();
 }
 
 async function loadDashboard(manual = false) {
   const status = document.getElementById("status");
   try {
     let payload;
-    const live = await fetch("/api/market", { cache: "no-store" });
+    const refreshUrl = manual
+      ? `/api/market?refresh=1&_=${Date.now()}`
+      : "/api/market";
+    const live = await fetch(refreshUrl, { cache: "no-store" });
     if (live.ok) {
       payload = await live.json();
     } else {
+      if (manual) throw new Error("Live refresh request failed");
       const fallback = await fetch("dashboard_data.json", { cache: "no-store" });
       if (!fallback.ok) throw new Error("No live API or snapshot available");
       payload = await fallback.json();
@@ -250,7 +265,9 @@ async function loadDashboard(manual = false) {
     document.getElementById("liveLabel").textContent = "Live";
   } catch (error) {
     status.classList.add("error");
-    status.textContent = "Could not load market data. Run python main.py or check the CoinGecko API key.";
+    status.textContent = manual
+      ? "Could not refresh live market data. Check the API connection and try again."
+      : "Could not load market data. Run python main.py or check the CoinGecko API key.";
     document.getElementById("liveLabel").textContent = "Offline";
   }
 }
@@ -269,12 +286,7 @@ function bindControls() {
   ["startDate", "endDate"].forEach((id) => {
     document.getElementById(id).addEventListener("change", drawCharts);
   });
-  document.getElementById("resetDates").addEventListener("click", () => {
-    const start = document.getElementById("startDate");
-    start.dataset.ready = "";
-    setDateBounds(dataset);
-    drawCharts();
-  });
+  document.getElementById("resetDates").addEventListener("click", resetDateRange);
   document.getElementById("downloadCsv").addEventListener("click", downloadCsv);
   document.getElementById("refreshNow").addEventListener("click", () => {
     secondsLeft = 60;

@@ -108,10 +108,14 @@ function correlation(x, y) {
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Cache-Control", "s-maxage=30, stale-while-revalidate=30");
+  const forceRefresh = new URL(req.url, "http://localhost").searchParams.get("refresh") === "1";
+  res.setHeader(
+    "Cache-Control",
+    forceRefresh ? "no-store" : "s-maxage=30, stale-while-revalidate=30"
+  );
   try {
     const now = Date.now();
-    if (!cache.payload || now > cache.expiresAt) {
+    if (forceRefresh || !cache.payload || now > cache.expiresAt) {
       cache.payload = await buildMarketPayload();
       cache.expiresAt = now + CACHE_MS;
     }
